@@ -1,0 +1,8 @@
+---
+Language:        Cpp
+BasedOnStyle:    Google
+IndentWidth:     4
+ColumnLimit:     120
+# 针对模块的特殊处理（防止 import 被乱缩进）
+SortIncludes:    true
+IncludeBlocks:   Regroup
