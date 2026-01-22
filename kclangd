@@ -1,0 +1,59 @@
+CompileFlags:
+  # 1. 伪装成 clang++ 驱动，确保它按 Clang 的逻辑解析参数
+  Compiler: clang++
+
+  # 2. 移除 GCC 15 的专用模块参数 (这些参数会让 clangd 报错或混淆)
+  Remove:
+    - -fmodules-ts
+    - -fmodule-mapper=*
+    - -fdeps-format=*
+    - -fmodule-only
+    - -fmodule-file=* # 移除 GCC 的预编译模块引用
+
+  # 3. 添加 Clang 需要的 C++23 模块参数
+  Add:
+    - -std=c++23
+    - -fcxx-modules             # 开启 Clang 的模块支持
+    - -stdlib=libc++    
+    - -Wno-unknown-warning-option
+    # 下面这行很重要：告诉 clangd 忽略系统头文件中的一些 GCC 扩展语法错误
+    - -Wno-pragma-system-header-outside-header 
+
+# 4. 针对 .cppm 或 .ixx 文件的特殊处理
+# If:
+#   PathMatch: .*\.(cppm|ixx|cc|cpp)
+# CompileFlags:
+#   Add: [-x, c++-module]
+
+Diagnostics:
+  ClangTidy:
+    Add: [performance*, modernize*, readability*, cppcoreguidelines-*, clang-analyzer-*, bugprone-*]
+    Remove: [modernize-use-trailing-return-type, readability-braces-around-statements, 
+              readability-named-parameter, readability-identifier-length]
+    CheckOptions:
+      readability-identifier-naming.VariableCase: camelBack
+
+      readability-identifier-naming.GlobalVariableCase: camelBack
+      readability-identifier-naming.GlobalVariablePrefix: g_
+
+      # readability-identifier-naming.MemberPrefix: m_
+      readability-identifier-naming.MemberCase: camelBack
+      readability-identifier-naming.ClassMemberPrefix: m_
+      readability-identifier-naming.ClassMemberCase: camelBack
+      readability-identifier-naming.ConstantMemberPrefix: k_
+
+      readability-identifier-naming.ConstantCase: camelBack
+
+      readability-identifier-naming.EnumCase: CamelCase
+      readability-identifier-naming.EnumConstantCase: CamelCase
+      readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+
+      readability-identifier-naming.ClassCase: CamelCase
+      readability-identifier-naming.StructCase: CamelCase
+
+      readability-identifier-naming.FunctionCase: lower_case
+      readability-identifier-naming.ClassMethodCase: camelBack
+      readability-identifier-naming.MethodCase: camelBack
+
+      radarness-identifier-naming.ConstantParameterPrefix: lower_case
+      readability-non-const-parameter: true

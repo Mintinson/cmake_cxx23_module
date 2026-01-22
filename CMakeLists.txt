@@ -15,6 +15,10 @@ add_executable(demo main.cpp)
 set_property(TARGET demo PROPERTY CXX_SCAN_FOR_MODULES ON)
 #  注意：这里使用了 FILE_SET CXX_MODULES 来明确告诉 CMake 这是模块文件)
 target_sources(demo PUBLIC FILE_SET CXX_MODULES FILES my_module.cppm)
+if (MSVC)
+    target_compile_options(demo PRIVATE /utf-8)
+endif()
+
 
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

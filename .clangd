@@ -1,26 +1,68 @@
-CompileFlags:
-  # 1. 伪装成 clang++ 驱动，确保它按 Clang 的逻辑解析参数
-  Compiler: clang++
+# CompileFlags:
+# #   # Treat code as C++, use C++20 standard, enable more warnings.
+#   Add: [-xc++, -std=c++latest, -fexperimental-library,-Wno-missing-prototypes,--cuda-path=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.5, --cuda-gpu-arch=sm_52, -LC:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.5\lib\x64, -IC:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.5\include]
+#   # Add:
+#   #   - --cuda-path=C:\ProgramData\NVIDIA GPU Computing Toolkit\v11.7
+#   #   - --cuda-gpu-arch=sm_52
+#   #   - -LC:\ProgramData\NVIDIA GPU Computing Toolkit\CUDA\v11.7\lib\x64
+#   #   - -IC:\ProgramData\NVIDIA GPU Computing Toolkit\CUDA\v11.7\include
 
-  # 2. 移除 GCC 15 的专用模块参数 (这些参数会让 clangd 报错或混淆)
-  Remove:
-    - -fmodules-ts
-    - -fmodule-mapper=*
-    - -fdeps-format=*
-    - -fmodule-only
-    - -fmodule-file=* # 移除 GCC 的预编译模块引用
+# #   # Remove extra warnings specified in compile commands.
+# #   # Single value is also acceptable, same as "Remove: [-mabi]"
+# #   Remove: -mabi
+Diagnostics:
+  # Tweak Clang-Tidy checks.
+  ClangTidy:
+    Add: [performance*, modernize*, readability*, cppcoreguidelines-*, clang-analyzer-*, bugprone-*]
+    Remove: [
+      modernize-use-trailing-return-type,
+        #  readability-braces-around-statements, 
+      #           readability-named-parameter, 
+      # readability-identifier-length
+    ]
+    CheckOptions:
+      # readability check  https://clang.llvm.org/extra/clang-tidy/checks/readability/identifier-naming.html
+      readability-identifier-naming.VariableCase: camelBack
 
-  # 3. 添加 Clang 需要的 C++23 模块参数
-  Add:
-    - -std=c++23
-    - -fcxx-modules             # 开启 Clang 的模块支持
-    - -stdlib=libc++    
-    - -Wno-unknown-warning-option
-    # 下面这行很重要：告诉 clangd 忽略系统头文件中的一些 GCC 扩展语法错误
-    - -Wno-pragma-system-header-outside-header 
+      readability-identifier-naming.GlobalVariableCase: camelBack
+      readability-identifier-naming.GlobalVariablePrefix: g_
 
-# 4. 针对 .cppm 或 .ixx 文件的特殊处理
-If:
-  PathMatch: .*\.(cppm|ixx|cc|cpp)
-CompileFlags:
-  Add: [-x, c++-module]
+      # readability-identifier-naming.MemberPrefix: m_
+      readability-identifier-naming.ClassCase: CamelCase
+      readability-identifier-naming.StructCase: CamelCase
+      readability-identifier-naming.ClassMethodCase: camelBack
+
+      readability-identifier-naming.MemberCase: lower_case
+      readability-identifier-naming.PrivateMemberSuffix: '_'
+
+      # static member variables
+      readability-identifier-naming.ClassMemberCase: lower_case
+      readability-identifier-naming.ConstantMemberPrefix: k
+
+      readability-identifier-naming.ConstantCase: camelBack
+
+      readability-identifier-naming.EnumCase: CamelCase
+      readability-identifier-naming.EnumConstantCase: CamelCase
+      readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+
+
+      readability-identifier-naming.FunctionCase: lower_case
+      readability-identifier-naming.MethodCase: camelBack
+
+      readability-identifier-naming.ConstantParameterPrefix: lower_case
+      readability-non-const-parameter: true
+
+InlayHints:              # 代码提示设置部分
+  Enabled: true          # 启用代码提示
+  ParameterNames: true   # 显示参数名称提示
+  DeducedTypes: true     # 显示推断类型提示
+  Designators: true      # 显示设计器提示
+# ---
+# # Use Remote Index Service for LLVM.
+# If:
+#   # Note: This is a regexp, notice '.*' at the end of PathMatch string.
+#   PathMatch: /path/to/llvm/.*
+# Index:
+#   External:
+#     Server: clangd-index.llvm.org:5900
+#     MountPoint: /path/to/llvm/
