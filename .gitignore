@@ -1,8 +1,11 @@
 build/**
 out/**
 
+# IDE specific
 .cache/**
 .vs/**
+
+.xmake/**
 
 VS/**
 

@@ -13,7 +13,7 @@
 Diagnostics:
   # Tweak Clang-Tidy checks.
   ClangTidy:
-    Add: [performance*, modernize*, readability*, cppcoreguidelines-*, clang-analyzer-*, bugprone-*]
+    Add: [performance*, modernize*, readability*, cppcoreguidelines-*, clang-analyzer-*, bugprone-*, "llvm-namespace-comment"]
     Remove: [
       modernize-use-trailing-return-type,
         #  readability-braces-around-statements, 
