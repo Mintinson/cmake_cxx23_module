@@ -14,20 +14,21 @@ toolchain("clang+libc++")
     set_toolset("as", "clang")        -- 汇编器
     set_toolset("ranlib", "llvm-ranlib")
     set_toolset("strip", "llvm-strip")
-    
     -- 保持系统默认的 ar/ranlib，不要覆盖
     -- set_toolset("ar", "ar") -- 注释掉，使用系统默认
 
     -- 加载时注入 flags
     on_load(function (toolchain)
         local flags = "-stdlib=libc++"
-        
+
+
         -- C++ 编译选项
         toolchain:add("cxxflags", flags)
         -- 链接选项
         toolchain:add("ldflags", flags)
         -- 动态库链接选项
         toolchain:add("shflags", flags)
+
 
         -- 【显式链接 ABI 库】
         -- 通常 -stdlib=libc++ 会自动处理，但为了保险（特别是源码编译环境），
@@ -46,5 +47,7 @@ toolchain("clang+libc++")
         toolchain:add("envs", "AS", "clang") -- FFmpeg 的汇编经常需要这个
         toolchain:add("envs", "AR", "llvm-ar")
         toolchain:add("envs", "RANLIB", "llvm-ranlib")
+
+
     end)
 toolchain_end()
