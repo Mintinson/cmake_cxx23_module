@@ -9,7 +9,15 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_COLOR_DIAGNOSTICS ON)  # colorize output
+set(CMAKE_COLOR_DIAGNOSTICS ON) # colorize output
+
+add_custom_target(CopyCompileCommands ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_BINARY_DIR}/compile_commands.json"
+    "${CMAKE_SOURCE_DIR}/compile_commands.json"
+    COMMENT "Copying compile_commands.json to source root..."
+    VERBATIM
+)
 
 add_executable(demo main.cpp)
 
@@ -23,12 +31,9 @@ if(MSVC)
     target_compile_options(demo PRIVATE /utf-8)
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 添加一个自定义目标，每次构建时检查并复制
-add_custom_target(CopyCompileCommands ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_BINARY_DIR}/compile_commands.json"
-    "${CMAKE_SOURCE_DIR}/compile_commands.json"
-    COMMENT "Copying compile_commands.json to source root..."
-    VERBATIM
-)
+add_executable(normal normal_main.cpp)
+
+if(MSVC)
+    target_compile_options(normal PRIVATE /utf-8)
+endif()

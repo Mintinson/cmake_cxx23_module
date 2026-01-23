@@ -1,7 +1,7 @@
+#include <concepts>
 #include <print>
 #include <ranges>
 #include <vector>
-#include <concepts>
 
 namespace normal
 {
@@ -21,5 +21,6 @@ int main()
     {
         std::println("Value: {}", v);
     }
+
     return 0;
 }
